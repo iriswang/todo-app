@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private final int EDIT_REQUEST_CODE = 20;
 
     ArrayList<TodoItem> todoItems;
-    ArrayAdapter<TodoItem> aTodoAdapter;
+    TodoItemAdapter todoItemAdapter;
     ListView lvItems;
     EditText etEditText;
     TodoItemDatabaseDAO todoItemDAO;
@@ -33,14 +32,14 @@ public class MainActivity extends AppCompatActivity {
         populateArrayItems();
 
         lvItems = (ListView) findViewById(R.id.lvItems);
-        lvItems.setAdapter(aTodoAdapter);
+        lvItems.setAdapter(todoItemAdapter);
         lvItems.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
                 long id) {
                 TodoItem itemToDelete = todoItems.get(position);
                 todoItems.remove(position);
-                aTodoAdapter.notifyDataSetChanged();
+                todoItemAdapter.notifyDataSetChanged();
                 todoItemDAO.deleteItem(itemToDelete._id);
                 return true;
             }
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             TodoItem item = new TodoItem(newItem);
             todoItemDAO.addItem(item);
-            aTodoAdapter.add(item);
+            todoItemAdapter.add(item);
             etEditText.setText("");
         } catch (Exception e) {
             Toast.makeText(this, "Item must at least contain one character!", Toast.LENGTH_SHORT)
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     todoItemDAO.updateItem(newItem);
                     int position = data.getExtras().getInt("position");
                     todoItems.set(position, newItem);
-                    aTodoAdapter.notifyDataSetChanged();
+                    todoItemAdapter.notifyDataSetChanged();
                 } catch (Exception e) {
                     Toast.makeText(this, "Item must at least contain one character!",
                         Toast.LENGTH_SHORT).show();
@@ -95,8 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void populateArrayItems() {
         todoItems = todoItemDAO.getAllItems();
-        aTodoAdapter = new ArrayAdapter<TodoItem>(
-            this, android.R.layout.simple_list_item_1, todoItems);
+        todoItemAdapter = new TodoItemAdapter(this, todoItems);
     }
 
 }
