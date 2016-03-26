@@ -12,37 +12,36 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-
-import org.apache.commons.io.FileUtils;
-
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private final int EDIT_REQUEST_CODE = 20;
 
-    ArrayList<String> todoItems;
-    ArrayAdapter<String> aTodoAdapter;
+    ArrayList<TodoItem> todoItems;
+    ArrayAdapter<TodoItem> aTodoAdapter;
     ListView lvItems;
     EditText etEditText;
+    TodoItemDatabaseDAO todoItemDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        TodoItemDatabaseHelper todoItemDBHelper = new TodoItemDatabaseHelper(this);
+        this.todoItemDAO = new TodoItemDatabaseDAO(todoItemDBHelper.getWritableDatabase());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         populateArrayItems();
+
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(aTodoAdapter);
-        etEditText = (EditText) findViewById(R.id.etEditText);
         lvItems.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
                 long id) {
+                TodoItem itemToDelete = todoItems.get(position);
                 todoItems.remove(position);
                 aTodoAdapter.notifyDataSetChanged();
-                writeItems();
+                todoItemDAO.deleteItem(itemToDelete._id);
                 return true;
             }
         });
@@ -52,24 +51,27 @@ public class MainActivity extends AppCompatActivity {
                 launchEditItemView(position);
             }
         });
+
+        etEditText = (EditText) findViewById(R.id.etEditText);
     }
 
     public void launchEditItemView(int position) {
         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
         i.putExtra("list_position", position);
-        i.putExtra("item_text", todoItems.get(position));
+        i.putExtra("item", todoItems.get(position));
         startActivityForResult(i, EDIT_REQUEST_CODE);
     }
 
     public void onAddItem(View view) {
         String newItem = etEditText.getText().toString();
-        if (newItem.isEmpty()) {
+        try {
+            TodoItem item = new TodoItem(newItem);
+            todoItemDAO.addItem(item);
+            aTodoAdapter.add(item);
+            etEditText.setText("");
+        } catch (Exception e) {
             Toast.makeText(this, "Item must at least contain one character!", Toast.LENGTH_SHORT)
                  .show();
-        } else {
-            aTodoAdapter.add(newItem);
-            etEditText.setText("");
-            writeItems();
         }
     }
 
@@ -77,38 +79,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                String newItem = data.getExtras().getString("new_item");
-                int position = data.getExtras().getInt("position");
-                todoItems.set(position, newItem);
-                aTodoAdapter.notifyDataSetChanged();
-                writeItems();
+                TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
+                try {
+                    todoItemDAO.updateItem(newItem);
+                    int position = data.getExtras().getInt("position");
+                    todoItems.set(position, newItem);
+                    aTodoAdapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Item must at least contain one character!",
+                        Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
 
     public void populateArrayItems() {
-        readItems();
-        aTodoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
-    }
-
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File file = new File (filesDir, "todo.txt");
-        try {
-            todoItems = new ArrayList<>(FileUtils.readLines(file));
-        } catch (IOException e) {
-            todoItems = new ArrayList<>();
-        }
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File file = new File (filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(file, todoItems);
-        } catch (IOException e) {
-
-        }
+        todoItems = todoItemDAO.getAllItems();
+        aTodoAdapter = new ArrayAdapter<TodoItem>(
+            this, android.R.layout.simple_list_item_1, todoItems);
     }
 
 }
