@@ -6,4 +6,7 @@
     <string name="EditItemBelow">Edit Item Below:</string>
     <string name="save_button">Save</string>
     <string name="title">Title</string>
+    <string name="Name">Name</string>
+    <string name="Date">Date</string>
+    <string name="priority">Priority</string>
 </resources>

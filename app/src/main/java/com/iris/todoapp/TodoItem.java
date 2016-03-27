@@ -38,10 +38,5 @@ public class TodoItem implements Serializable{
     public TodoItem(String title) {
         this.title = title;
     }
-
-    @Override
-    public String toString() {
-        return this.title;
-    }
 }
 
