@@ -4,15 +4,22 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.Toast;
+
+import com.google.common.collect.ImmutableMap;
+
+import com.iris.todoapp.TodoItem.Status;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private final int EDIT_REQUEST_CODE = 20;
@@ -20,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
     private final String COMPLETED_ITEMS = "Completed";
     private final String UNFINISHED_ITEMS = "To Do";
 
+    private final Map<Status, String> statusToGroupNameMap = ImmutableMap.of(
+        Status.DONE, COMPLETED_ITEMS,
+        Status.TODO, UNFINISHED_ITEMS
+    );
 
     TodoItemExpandableListAdapter todoItemListAdapter;
     ExpandableListView expListView;
@@ -58,6 +69,45 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpExpListViewClickHandlers() {
 
+        expListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
+                long id) {
+                int itemType = ExpandableListView.getPackedPositionType(id);
+
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    String groupName = todoItemListDataHeaders.get(groupPosition);
+                    TodoItem itemToDelete =
+                        todoItemsListDataChildren.get(groupName).get(childPosition);
+                    todoItemDAO.deleteItem(itemToDelete._id);
+                    todoItemsListDataChildren.get(groupName).remove(childPosition);
+                    todoItemListAdapter.notifyDataSetChanged();
+                    return true; //true if we consumed the click, false if not
+                } else {
+                    return false;
+                }
+            }
+        });
+
+        expListView.setOnChildClickListener(new OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                int groupPosition, int childPosition, long id) {
+                launchEditItemView(groupPosition, childPosition);
+                return true;
+            }
+        });
+
+    }
+
+    private void launchEditItemView(int groupPosition, int childPosition) {
+        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+        i.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
+        i.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
+        i.putExtra("item", fetchTodoItem(groupPosition, childPosition));
+        startActivityForResult(i, EDIT_REQUEST_CODE);
     }
 
     public void onAddItem(View view) {
@@ -74,23 +124,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private TodoItem fetchTodoItem(int groupPosition, int childPosition) {
+        return todoItemsListDataChildren.get(
+            todoItemListDataHeaders.get(groupPosition)).get(childPosition);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
-                int position = data.getExtras().getInt("position");
-//                if (newItem != todoItems.get(position)) {
-//                    try {
-//                        todoItemDAO.updateItem(newItem);
-//                        todoItems.remove(position);
-//                        todoItems.add(newItem);
-//                        todoItemListAdapter.notifyDataSetChanged();
-//                    } catch (Exception e) {
-//                        Toast.makeText(this, "Item must at least contain one character!",
-//                            Toast.LENGTH_SHORT).show();
-//                    }
-//                }
+                int groupPosition = data.getExtras().getInt(TodoAppConstants.GROUP_POSITION);
+                int childPosition = data.getExtras().getInt(TodoAppConstants.CHILD_POSITION);
+                TodoItem oldItem = fetchTodoItem(groupPosition, childPosition);
+                if (newItem != oldItem) {
+                    try {
+                        todoItemDAO.updateItem(newItem);
+                        String newGroupName = statusToGroupNameMap.get(newItem.status);
+                        if (newItem.status != oldItem.status) {
+                            String groupName = todoItemListDataHeaders.get(groupPosition);
+                            todoItemsListDataChildren.get(groupName).remove(childPosition);
+                            todoItemsListDataChildren.get(newGroupName).add(newItem);
+                        } else {
+                            todoItemsListDataChildren.get(newGroupName).set(
+                                childPosition, newItem);
+                        }
+                        todoItemListAdapter.notifyDataSetChanged();
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Item must at least contain one character!",
+                            Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         }
     }

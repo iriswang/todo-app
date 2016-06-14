@@ -4,21 +4,16 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +23,8 @@ public class EditItemActivity extends AppCompatActivity {
         Arrays.asList(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
     private final List<Status> statuses =
         Arrays.asList(Status.TODO, Status.DONE);
-    int position;
+    int groupPosition;
+    int childPosition;
     TodoItem item;
     EditText editItem;
     Spinner prioritySpinner;
@@ -39,7 +35,8 @@ public class EditItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
         editItem = (EditText) findViewById(R.id.etEditItem);
-        position = getIntent().getIntExtra("list_position", -1);
+        groupPosition = getIntent().getIntExtra(TodoAppConstants.GROUP_POSITION, -1);
+        childPosition = getIntent().getIntExtra(TodoAppConstants.CHILD_POSITION, -1);
 
         item = (TodoItem) getIntent().getSerializableExtra("item");
         editItem.setText(item.title);
@@ -94,7 +91,8 @@ public class EditItemActivity extends AppCompatActivity {
         String newItemText = editItem.getText().toString();
         item.title = newItemText;
         Intent data = new Intent();
-        data.putExtra("position", position);
+        data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
+        data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
         data.putExtra("new_item", item);
         setResult(RESULT_OK, data);
         finish();

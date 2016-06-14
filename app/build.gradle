@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'commons-io:commons-io:2.4'
     compile 'nl.qbusict:cupboard:2.1.4'
+    compile 'com.google.guava:guava:14.0.1'
 }
