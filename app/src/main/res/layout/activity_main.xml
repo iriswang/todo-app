@@ -16,28 +16,18 @@
         android:text="@string/add"
         android:id="@+id/btnAddItem"
         android:layout_alignTop="@+id/etEditText"
-        android:layout_alignRight="@+id/todoItems"
-        android:layout_alignEnd="@+id/todoItems"
+        android:layout_alignRight="@+id/lvExp"
+        android:layout_alignEnd="@+id/lvExp"
         android:onClick="onAddItem"/>
 
-
-    <ListView
-        android:layout_width="wrap_content"
+    <ExpandableListView
+        android:id="@+id/lvExp"
         android:layout_height="wrap_content"
-        android:id="@+id/todoItems"
+        android:layout_width="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_above="@+id/finishedItems"/>
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/finishedItems"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@+id/btnAddItem"/>
+        android:layout_above="@id/btnAddItem"/>
 
     <EditText
         android:layout_width="wrap_content"

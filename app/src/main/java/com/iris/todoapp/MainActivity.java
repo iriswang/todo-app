@@ -4,25 +4,28 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private final int EDIT_REQUEST_CODE = 20;
 
-    ArrayList<TodoItem> todoItems;
-    ArrayList<TodoItem> finishedItems;
-    TodoItemAdapter finishedItemAdapter;
-    TodoItemAdapter todoItemAdapter;
-    ListView todoItemsView;
-    ListView finishedItemsView;
+    private final String COMPLETED_ITEMS = "Completed";
+    private final String UNFINISHED_ITEMS = "To Do";
+
+
+    TodoItemExpandableListAdapter todoItemListAdapter;
+    ExpandableListView expListView;
+    List<String> todoItemListDataHeaders;
+    HashMap<String, List<TodoItem>> todoItemsListDataChildren;
+
     EditText etEditText;
     TodoItemDatabaseDAO todoItemDAO;
 
@@ -33,52 +36,28 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        populateTodoListItems();
 
-        todoItemsView = (ListView) findViewById(R.id.todoItems);
-        finishedItemsView = (ListView) findViewById(R.id.finishedItems);
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
+        prepareListData();
+        setUpExpListViewClickHandlers();
+        todoItemListAdapter = new TodoItemExpandableListAdapter(this, todoItemListDataHeaders,
+            todoItemsListDataChildren);
 
-        setTodoItemsView(todoItemAdapter, todoItemsView, false);
-        setTodoItemsView(finishedItemAdapter, finishedItemsView, true);
-
+        expListView.setAdapter(todoItemListAdapter);
         etEditText = (EditText) findViewById(R.id.etEditText);
     }
 
-    public void setTodoItemsView(TodoItemAdapter adapter, ListView view,
-        final boolean completedItems) {
-        view.setAdapter(adapter);
-        view.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
-                long id) {
-                TodoItem itemToDelete;
-                if (completedItems) {
-                    //TODO: replace this with other list
-                    itemToDelete = finishedItems.get(position);
-                    finishedItems.remove(position);
-                    finishedItemAdapter.notifyDataSetChanged();
-                } else {
-                    itemToDelete = todoItems.get(position);
-                    todoItems.remove(position);
-                    todoItemAdapter.notifyDataSetChanged();
-                }
-                todoItemDAO.deleteItem(itemToDelete._id);
-                return true;
-            }
-        });
-        view.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                launchEditItemView(position);
-            }
-        });
+    private void prepareListData() {
+        todoItemListDataHeaders = new ArrayList<String>();
+        todoItemsListDataChildren = new HashMap<String, List<TodoItem>>();
+        todoItemListDataHeaders.add(UNFINISHED_ITEMS);
+        todoItemListDataHeaders.add(COMPLETED_ITEMS);
+        todoItemsListDataChildren.put(UNFINISHED_ITEMS, todoItemDAO.getUnfinishedItems());
+        todoItemsListDataChildren.put(COMPLETED_ITEMS, todoItemDAO.getCompletedItems());
     }
 
-    public void launchEditItemView(int position) {
-        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-        i.putExtra("list_position", position);
-        i.putExtra("item", todoItems.get(position));
-        startActivityForResult(i, EDIT_REQUEST_CODE);
+    private void setUpExpListViewClickHandlers() {
+
     }
 
     public void onAddItem(View view) {
@@ -86,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             TodoItem item = new TodoItem(newItem);
             todoItemDAO.addItem(item);
-            todoItemAdapter.add(item);
+            todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(item);
             etEditText.setText("");
+            todoItemListAdapter.notifyDataSetChanged();
         } catch (Exception e) {
             Toast.makeText(this, "Item must at least contain one character!", Toast.LENGTH_SHORT)
                  .show();
@@ -100,25 +80,18 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
                 int position = data.getExtras().getInt("position");
-                if (newItem != todoItems.get(position)) {
-                    try {
-                        todoItemDAO.updateItem(newItem);
-                        todoItems.remove(position);
-                        todoItems.add(newItem);
-                        todoItemAdapter.notifyDataSetChanged();
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Item must at least contain one character!",
-                            Toast.LENGTH_SHORT).show();
-                    }
-                }
+//                if (newItem != todoItems.get(position)) {
+//                    try {
+//                        todoItemDAO.updateItem(newItem);
+//                        todoItems.remove(position);
+//                        todoItems.add(newItem);
+//                        todoItemListAdapter.notifyDataSetChanged();
+//                    } catch (Exception e) {
+//                        Toast.makeText(this, "Item must at least contain one character!",
+//                            Toast.LENGTH_SHORT).show();
+//                    }
+//                }
             }
         }
-    }
-
-    private void populateTodoListItems() {
-        todoItems = todoItemDAO.getUnfinishedItems();
-        todoItemAdapter = new TodoItemAdapter(this, todoItems);
-        finishedItems = todoItemDAO.getCompletedItems();
-        finishedItemAdapter = new TodoItemAdapter(this, finishedItems);
     }
 }
