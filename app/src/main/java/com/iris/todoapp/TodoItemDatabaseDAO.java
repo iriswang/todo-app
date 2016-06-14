@@ -4,6 +4,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
+import com.iris.todoapp.TodoItem.Status;
+
+
 import java.util.ArrayList;
 
 import nl.qbusict.cupboard.QueryResultIterable;
@@ -31,6 +34,29 @@ public class TodoItemDatabaseDAO {
 
     public void deleteItem(long id) {
         cupboard().withDatabase(db).delete(TodoItem.class, id);
+    }
+
+    public ArrayList<TodoItem> getCompletedItems() {
+        Cursor items = cupboard().withDatabase(db).query(TodoItem.class).getCursor();
+        ArrayList<TodoItem> result = new ArrayList<>();
+        QueryResultIterable<TodoItem> itemsIterable =
+            cupboard().withDatabase(db).query(TodoItem.class).withSelection(
+                "status = ?", Status.DONE.toString()).query();
+        for (TodoItem item: itemsIterable) {
+            result.add(item);
+        }
+        return result;
+    }
+
+    public ArrayList<TodoItem> getUnfinishedItems() {
+        ArrayList<TodoItem> result = new ArrayList<>();
+        QueryResultIterable<TodoItem> itemsIterable =
+            cupboard().withDatabase(db).query(TodoItem.class).withSelection(
+                "status = ?", Status.TODO.toString()).query();
+        for (TodoItem item: itemsIterable) {
+            result.add(item);
+        }
+        return result;
     }
 
     public ArrayList<TodoItem> getAllItems() {

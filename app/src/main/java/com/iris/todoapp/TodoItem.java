@@ -24,9 +24,9 @@ public class TodoItem implements Serializable{
 
     public String notes = "";
 
-    public String priority = null;
+    public Priority priority = Priority.MEDIUM;
 
-    public String status = Status.TODO.toString();
+    public Status status = Status.TODO;
 
     public Long tag = null;
 

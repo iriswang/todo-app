@@ -15,18 +15,24 @@ import android.widget.TextView;
 
 
 import com.iris.todoapp.TodoItem.Priority;
+import com.iris.todoapp.TodoItem.Status;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EditItemActivity extends AppCompatActivity {
 
+    private final List<Priority> priorities =
+        Arrays.asList(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
+    private final List<Status> statuses =
+        Arrays.asList(Status.TODO, Status.DONE);
     int position;
     TodoItem item;
     EditText editItem;
     Spinner prioritySpinner;
-    List<String> priorities;
+    Spinner statusSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +44,19 @@ public class EditItemActivity extends AppCompatActivity {
         item = (TodoItem) getIntent().getSerializableExtra("item");
         editItem.setText(item.title);
 
-        createPrioritySpinner(item);
+        createPrioritySpinner(item.priority);
+        createStatusSpinner(item.status);
+}
+
+    public void createPrioritySpinner(Priority originalPriority) {
+        prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
+
+        ArrayAdapter<Priority> priorityListAdapter = new ArrayAdapter<Priority>(this,
+            android.R.layout.simple_spinner_item, priorities);
+
+        priorityListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        prioritySpinner.setAdapter(priorityListAdapter);
+        prioritySpinner.setSelection(priorities.indexOf(originalPriority));
         prioritySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -49,43 +67,27 @@ public class EditItemActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-}
+    }
 
-    public void createPrioritySpinner(TodoItem item) {
-        prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
-        priorities = new ArrayList<String>();
-        priorities.add(Priority.HIGH.toString());
-        priorities.add(Priority.MEDIUM.toString());
-        priorities.add(Priority.LOW.toString());
-        priorities.add("Select one");
+    public void createStatusSpinner(Status originalStatus) {
+        statusSpinner = (Spinner) findViewById(R.id.statusSpinner);
 
-        ArrayAdapter<String> priorityListAdapter = new ArrayAdapter<String>(this,
-            android.R.layout.simple_spinner_item, priorities) {
+        ArrayAdapter<Status> statusArrayAdapter = new ArrayAdapter<Status>(this,
+            android.R.layout.simple_spinner_item, statuses);
 
+        statusArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statusSpinner.setAdapter(statusArrayAdapter);
+        statusSpinner.setSelection(statuses.indexOf(originalStatus));
+        statusSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
-                }
-                return v;
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                item.status = statuses.get(position);
             }
 
             @Override
-            public int getCount() {
-                return super.getCount() - 1;
+            public void onNothingSelected(AdapterView<?> parent) {
             }
-
-        };
-
-        priorityListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        prioritySpinner.setAdapter(priorityListAdapter);
-        if (item.priority == null) {
-            prioritySpinner.setSelection(priorityListAdapter.getCount());
-        } else {
-            prioritySpinner.setSelection(priorities.indexOf(item.priority));
-        }
+        });
     }
 
     public void onSaveItem(View view) {

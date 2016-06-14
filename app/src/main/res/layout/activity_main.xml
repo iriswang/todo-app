@@ -16,15 +16,24 @@
         android:text="@string/add"
         android:id="@+id/btnAddItem"
         android:layout_alignTop="@+id/etEditText"
-        android:layout_alignRight="@+id/lvItems"
-        android:layout_alignEnd="@+id/lvItems"
+        android:layout_alignRight="@+id/todoItems"
+        android:layout_alignEnd="@+id/todoItems"
         android:onClick="onAddItem"/>
 
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/lvItems"
+        android:id="@+id/todoItems"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/finishedItems"/>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/finishedItems"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
