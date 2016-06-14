@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:todoapp="http://schemas.android.com/apk/res-auto" >
+
+    <item android:id="@+id/new_task"
+          android:icon="@drawable/icon_plus_alt2"
+          android:title="@string/new_task"
+          todoapp:showAsAction="always"/>
+</menu>
