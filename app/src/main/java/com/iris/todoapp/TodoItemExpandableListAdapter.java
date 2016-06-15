@@ -1,7 +1,12 @@
 package com.iris.todoapp;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -12,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
 
@@ -121,5 +127,20 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
     public void registerDataSetObserver(DataSetObserver observer) {
         super.registerDataSetObserver(observer);
     }
+
+    @Override
+    public void notifyDataSetChanged() {
+        for (Map.Entry<String, List<TodoItem>> entry: this._listDataChildren.entrySet()) {
+            Collections.sort(entry.getValue(), new Comparator<TodoItem>() {
+                    @Override
+                    public int compare(TodoItem lhs, TodoItem rhs) {
+                        return Priority.sort(lhs.priority, rhs.priority);
+                    }
+                });
+        }
+
+        super.notifyDataSetChanged();
+    }
+
 
 }

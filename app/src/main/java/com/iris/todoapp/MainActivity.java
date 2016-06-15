@@ -16,10 +16,13 @@ import android.widget.Toast;
 
 import com.google.common.collect.ImmutableMap;
 
+import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +69,22 @@ public class MainActivity extends AppCompatActivity {
         todoItemsListDataChildren = new HashMap<String, List<TodoItem>>();
         todoItemListDataHeaders.add(UNFINISHED_ITEMS);
         todoItemListDataHeaders.add(COMPLETED_ITEMS);
-        todoItemsListDataChildren.put(UNFINISHED_ITEMS, todoItemDAO.getUnfinishedItems());
-        todoItemsListDataChildren.put(COMPLETED_ITEMS, todoItemDAO.getCompletedItems());
+        List<TodoItem> sortedUnfinishedItems = todoItemDAO.getUnfinishedItems();
+        Collections.sort(sortedUnfinishedItems, new Comparator<TodoItem>() {
+            @Override
+            public int compare(TodoItem lhs, TodoItem rhs) {
+                return Priority.sort(lhs.priority, rhs.priority);
+            }
+        });
+        todoItemsListDataChildren.put(UNFINISHED_ITEMS, sortedUnfinishedItems);
+        List<TodoItem> sortedCompletedItems = todoItemDAO.getCompletedItems();
+        Collections.sort(sortedCompletedItems, new Comparator<TodoItem>() {
+            @Override
+            public int compare(TodoItem lhs, TodoItem rhs) {
+                return Priority.sort(lhs.priority, rhs.priority);
+            }
+        });
+        todoItemsListDataChildren.put(COMPLETED_ITEMS, sortedCompletedItems);
     }
 
     private void setUpExpListViewClickHandlers() {
