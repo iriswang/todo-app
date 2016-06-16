@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import nl.qbusict.cupboard.annotation.Column;
@@ -15,6 +17,9 @@ public class TodoItem implements Serializable{
 
     public enum Priority {
         HIGH, MEDIUM, LOW;
+
+        public static final List<Priority> ALL_PRIORITIES =
+            Arrays.asList(HIGH, MEDIUM, LOW);
 
         public static int sort(Priority lhs, Priority rhs) {
             Map<Priority, Integer> priorityValues = ImmutableMap.of(
@@ -28,6 +33,9 @@ public class TodoItem implements Serializable{
 
     public enum Status {
         TODO, DONE;
+
+        public static final List<Status> ALL_STATUSES =
+            Arrays.asList(Status.TODO, Status.DONE);
     }
 
     public Long _id;

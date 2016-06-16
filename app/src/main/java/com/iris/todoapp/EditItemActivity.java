@@ -5,33 +5,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 
 public class EditItemActivity extends AppCompatActivity {
-
-    private final List<Priority> priorities =
-        Arrays.asList(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
-    private final List<Status> statuses =
-        Arrays.asList(Status.TODO, Status.DONE);
 
     int groupPosition;
     int childPosition;
@@ -87,15 +76,15 @@ public class EditItemActivity extends AppCompatActivity {
         prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
 
         ArrayAdapter<Priority> priorityListAdapter = new ArrayAdapter<Priority>(this,
-            android.R.layout.simple_spinner_item, priorities);
+            android.R.layout.simple_spinner_item, TodoItem.Priority.ALL_PRIORITIES);
 
         priorityListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         prioritySpinner.setAdapter(priorityListAdapter);
-        prioritySpinner.setSelection(priorities.indexOf(originalPriority));
+        prioritySpinner.setSelection(Priority.ALL_PRIORITIES.indexOf(originalPriority));
         prioritySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                item.priority = priorities.get(position);
+                item.priority = Priority.ALL_PRIORITIES.get(position);
             }
 
             @Override
@@ -108,15 +97,15 @@ public class EditItemActivity extends AppCompatActivity {
         statusSpinner = (Spinner) findViewById(R.id.statusSpinner);
 
         ArrayAdapter<Status> statusArrayAdapter = new ArrayAdapter<Status>(this,
-            android.R.layout.simple_spinner_item, statuses);
+            android.R.layout.simple_spinner_item, Status.ALL_STATUSES);
 
         statusArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         statusSpinner.setAdapter(statusArrayAdapter);
-        statusSpinner.setSelection(statuses.indexOf(originalStatus));
+        statusSpinner.setSelection(Status.ALL_STATUSES.indexOf(originalStatus));
         statusSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                item.status = statuses.get(position);
+                item.status = Status.ALL_STATUSES.get(position);
             }
 
             @Override

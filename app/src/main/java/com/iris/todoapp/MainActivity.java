@@ -29,6 +29,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private final int EDIT_REQUEST_CODE = 20;
+    private final int ADD_REQUEST_CODE = 30;
 
     private final String COMPLETED_ITEMS = "Completed";
     private final String UNFINISHED_ITEMS = "To Do";
@@ -153,7 +154,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_REQUEST_CODE) {
             handleEditItemResult(data, resultCode);
-       }
+        } else if (requestCode == ADD_REQUEST_CODE) {
+            handleAddItemResult(data, resultCode);
+        }
     }
 
     private void handleEditItemResult(Intent data, int resultCode) {
@@ -177,7 +180,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void newTask() {
+    private void handleAddItemResult(Intent data, int resultCode) {
+        if (resultCode == RESULT_OK) {
+            TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
+            todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
+            etEditText.setText("");
+            todoItemListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void addNewTask() {
+        Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+        startActivityForResult(i, ADD_REQUEST_CODE);
         Toast.makeText(this, "menu works!", Toast.LENGTH_SHORT)
              .show();
     }
@@ -191,10 +205,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.new_task:
-                newTask();
+                addNewTask();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
