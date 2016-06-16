@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
+
+import org.w3c.dom.Text;
 
 
 public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
@@ -66,12 +69,23 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
 
         if (childItem.status == Status.TODO) {
             txtListChildPriority.setText(childItem.priority.toString());
+            setPriorityViewColor(txtListChildPriority, childItem);
         } else {
             txtListChildPriority.setText("");
-
         }
 
         return convertView;
+    }
+
+    private void setPriorityViewColor(TextView tv, TodoItem item) {
+        if (item.priority == Priority.HIGH) {
+            tv.setTextColor(Color.parseColor("#D62920"));
+        } else if (item.priority == Priority.MEDIUM) {
+            tv.setTextColor(Color.parseColor("#F0BF2B"));
+        } else {
+            tv.setTextColor(Color.parseColor("#1CC78B"));
+        }
+
     }
 
     @Override

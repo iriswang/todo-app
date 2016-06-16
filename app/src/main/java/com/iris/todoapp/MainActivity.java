@@ -163,23 +163,17 @@ public class MainActivity extends AppCompatActivity {
             int childPosition = data.getExtras().getInt(TodoAppConstants.CHILD_POSITION);
             TodoItem oldItem = fetchTodoItem(groupPosition, childPosition);
             if (newItem != oldItem) {
-                try {
-                    todoItemDAO.updateItem(newItem);
-                    String newGroupName = statusToGroupNameMap.get(newItem.status);
-                    if (newItem.status != oldItem.status) {
-                        String groupName = todoItemListDataHeaders.get(groupPosition);
-                        todoItemsListDataChildren.get(groupName).remove(childPosition);
-                        todoItemsListDataChildren.get(newGroupName).add(newItem);
-                    } else {
-                        todoItemsListDataChildren.get(newGroupName).set(
-                            childPosition, newItem);
-                    }
-                    todoItemListAdapter.notifyDataSetChanged();
-                } catch (Exception e) {
-                    Toast.makeText(this, "Item must at least contain one character!",
-                        Toast.LENGTH_SHORT).show();
+                String newGroupName = statusToGroupNameMap.get(newItem.status);
+                if (newItem.status != oldItem.status) {
+                    String groupName = todoItemListDataHeaders.get(groupPosition);
+                    todoItemsListDataChildren.get(groupName).remove(childPosition);
+                    todoItemsListDataChildren.get(newGroupName).add(newItem);
+                } else {
+                    todoItemsListDataChildren.get(newGroupName).set(
+                        childPosition, newItem);
                 }
-            }
+                todoItemListAdapter.notifyDataSetChanged();
+           }
         }
     }
 

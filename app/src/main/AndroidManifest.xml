@@ -17,7 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".EditItemActivity">
+        <activity android:name=".EditItemActivity"
+            android:label="@string/edit_item_label">
         </activity>
     </application>
 

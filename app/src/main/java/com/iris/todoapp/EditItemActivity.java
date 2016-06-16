@@ -1,19 +1,28 @@
 package com.iris.todoapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,15 +32,20 @@ public class EditItemActivity extends AppCompatActivity {
         Arrays.asList(Priority.HIGH, Priority.MEDIUM, Priority.LOW);
     private final List<Status> statuses =
         Arrays.asList(Status.TODO, Status.DONE);
+
     int groupPosition;
     int childPosition;
     TodoItem item;
     EditText editItem;
     Spinner prioritySpinner;
     Spinner statusSpinner;
+    TodoItemDatabaseDAO todoItemDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        TodoItemDatabaseHelper todoItemDBHelper = new TodoItemDatabaseHelper(this);
+        this.todoItemDAO = new TodoItemDatabaseDAO(todoItemDBHelper.getWritableDatabase());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
         editItem = (EditText) findViewById(R.id.etEditItem);
@@ -43,7 +57,31 @@ public class EditItemActivity extends AppCompatActivity {
 
         createPrioritySpinner(item.priority);
         createStatusSpinner(item.status);
-}
+    }
+
+    private void handleInvalidEdit() {
+        AlertDialog.Builder invalidEditBuilder = new AlertDialog.Builder(EditItemActivity.this);
+        invalidEditBuilder.setMessage("Item must at least contain one character!");
+        invalidEditBuilder.setCancelable(true);
+
+        invalidEditBuilder.setPositiveButton("OK",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            });
+
+        invalidEditBuilder.setNegativeButton(
+            "Cancel",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    finish();
+                    dialog.cancel();
+                }
+            });
+        AlertDialog invalidTitleAlert = invalidEditBuilder.create();
+        invalidTitleAlert.show();
+    }
 
     public void createPrioritySpinner(Priority originalPriority) {
         prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
@@ -90,12 +128,25 @@ public class EditItemActivity extends AppCompatActivity {
     public void onSaveItem(View view) {
         String newItemText = editItem.getText().toString();
         item.title = newItemText;
-        Intent data = new Intent();
-        data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
-        data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
-        data.putExtra("new_item", item);
-        setResult(RESULT_OK, data);
-        finish();
+        try {
+            todoItemDAO.updateItem(item);
+            Intent data = new Intent();
+            data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
+            data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
+            data.putExtra("new_item", item);
+            setResult(RESULT_OK, data);
+            finish();
+        } catch (Exception e) {
+            handleInvalidEdit();
+        }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.edit_item_memu, menu);
+        return true;
+    }
+
 
 }
