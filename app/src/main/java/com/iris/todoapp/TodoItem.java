@@ -78,7 +78,7 @@ public class TodoItem implements Serializable {
         if (obj == null || !(obj instanceof TodoItem))
             return false;
         TodoItem other = (TodoItem) obj;
-        return _id.equals(other._id)
+        return _id == other._id
             && dueDate == other.dueDate
             && priority == other.priority
             && status == other.status

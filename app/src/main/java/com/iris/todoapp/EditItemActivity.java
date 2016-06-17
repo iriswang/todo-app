@@ -26,6 +26,7 @@ public class EditItemActivity extends AppCompatActivity {
     TodoItem originalItem;
     TodoItem item;
     EditText editItem;
+    EditText editNotes;
     Spinner prioritySpinner;
     Spinner statusSpinner;
     TodoItemDatabaseDAO todoItemDAO;
@@ -38,6 +39,11 @@ public class EditItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
         editItem = (EditText) findViewById(R.id.etEditItem);
+        editItem.setSelection(editItem.getText().length());
+
+        editNotes = (EditText) findViewById(R.id.etEditNotes);
+        editNotes.setSelection(editNotes.getText().length());
+
         groupPosition = getIntent().getIntExtra(TodoAppConstants.GROUP_POSITION, -1);
         childPosition = getIntent().getIntExtra(TodoAppConstants.CHILD_POSITION, -1);
         requestType = (int) getIntent().getSerializableExtra("request_type");
@@ -45,15 +51,18 @@ public class EditItemActivity extends AppCompatActivity {
         if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
             item = new TodoItem();
             editItem.setText("");
+            editNotes.setText("");
         } else {
             item = (TodoItem) getIntent().getSerializableExtra("item");
             editItem.setText(item.title);
+            editNotes.setText(item.notes);
         }
 
         originalItem = TodoItem.newInstance(item);
         createPrioritySpinner(item.priority);
         createStatusSpinner(item.status);
     }
+
 
     private void handleInvalidEdit() {
         AlertDialog.Builder invalidEditBuilder = new AlertDialog.Builder(EditItemActivity.this);
@@ -122,8 +131,8 @@ public class EditItemActivity extends AppCompatActivity {
     }
 
     public void onSaveItem() {
-        String newItemText = editItem.getText().toString();
-        item.title = newItemText;
+        item.title = editItem.getText().toString();
+        item.notes =  editNotes.getText().toString();
         try {
             Intent data = new Intent();
             if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
@@ -177,8 +186,9 @@ public class EditItemActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.cancel_action:
-                if (originalItem.equals(item) &&
-                    editItem.getText().toString().equals(originalItem.title)) {
+                if (originalItem.equals(item)
+                    && editItem.getText().toString().equals(originalItem.title)
+                    && editNotes.getText().toString().equals(originalItem.notes)) {
                     finish();
                 } else {
                    handleExitWithChanges();
