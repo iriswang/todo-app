@@ -28,8 +28,8 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String COMPLETED_ITEMS = "Completed";
-    private final String UNFINISHED_ITEMS = "To Do";
+    private final String COMPLETED_ITEMS = "COMPLETED";
+    private final String UNFINISHED_ITEMS = "TO DO";
 
     private final Map<Status, String> statusToGroupNameMap = ImmutableMap.of(
         Status.DONE, COMPLETED_ITEMS,
@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
+        expListView.setGroupIndicator(null);
+
         prepareListData();
         setUpExpListViewClickHandlers();
         todoItemListAdapter = new TodoItemExpandableListAdapter(this, todoItemListDataHeaders,
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         expListView.setAdapter(todoItemListAdapter);
         expListView.expandGroup(0);
+        expListView.expandGroup(1);
 
     }
 

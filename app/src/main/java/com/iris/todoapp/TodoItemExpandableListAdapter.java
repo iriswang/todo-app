@@ -70,7 +70,9 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
         if (childItem.status == Status.TODO) {
             txtListChildPriority.setText(childItem.priority.toString());
             setPriorityViewColor(txtListChildPriority, childItem);
+            txtListChildName.setTextColor(Color.parseColor("#000000"));
         } else {
+            txtListChildName.setTextColor(Color.parseColor("#8c8c8c"));
             txtListChildPriority.setText("");
         }
 
