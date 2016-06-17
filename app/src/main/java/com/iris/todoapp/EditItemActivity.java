@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -14,16 +15,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
-
-
 
 public class EditItemActivity extends AppCompatActivity {
 
     int groupPosition;
     int childPosition;
+    int requestType;
+    TodoItem originalItem;
     TodoItem item;
     EditText editItem;
     Spinner prioritySpinner;
@@ -40,10 +40,17 @@ public class EditItemActivity extends AppCompatActivity {
         editItem = (EditText) findViewById(R.id.etEditItem);
         groupPosition = getIntent().getIntExtra(TodoAppConstants.GROUP_POSITION, -1);
         childPosition = getIntent().getIntExtra(TodoAppConstants.CHILD_POSITION, -1);
+        requestType = (int) getIntent().getSerializableExtra("request_type");
 
-        item = (TodoItem) getIntent().getSerializableExtra("item");
-        editItem.setText(item.title);
+        if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
+            item = new TodoItem();
+            editItem.setText("");
+        } else {
+            item = (TodoItem) getIntent().getSerializableExtra("item");
+            editItem.setText(item.title);
+        }
 
+        originalItem = TodoItem.newInstance(item);
         createPrioritySpinner(item.priority);
         createStatusSpinner(item.status);
     }
@@ -114,14 +121,18 @@ public class EditItemActivity extends AppCompatActivity {
         });
     }
 
-    public void onSaveItem(View view) {
+    public void onSaveItem() {
         String newItemText = editItem.getText().toString();
         item.title = newItemText;
         try {
-            todoItemDAO.updateItem(item);
             Intent data = new Intent();
-            data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
-            data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
+            if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
+               todoItemDAO.addItem(item);
+            } else {
+                todoItemDAO.updateItem(item);
+                data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
+                data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
+            }
             data.putExtra("new_item", item);
             setResult(RESULT_OK, data);
             finish();
@@ -130,12 +141,56 @@ public class EditItemActivity extends AppCompatActivity {
         }
     }
 
+    private void handleExitWithChanges() {
+        AlertDialog.Builder invalidEditBuilder = new AlertDialog.Builder(EditItemActivity.this);
+        invalidEditBuilder.setMessage("Discard your changes?");
+        invalidEditBuilder.setCancelable(true);
+
+        invalidEditBuilder.setPositiveButton("OK",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    finish();
+                    dialog.cancel();
+                }
+            });
+
+        invalidEditBuilder.setNegativeButton(
+            "CANCEL",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            });
+        AlertDialog invalidTitleAlert = invalidEditBuilder.create();
+        invalidTitleAlert.show();
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.edit_item_memu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.cancel_action:
+                if (originalItem.equals(item) &&
+                    editItem.getText().toString().equals(originalItem.title)) {
+                    finish();
+                } else {
+                   handleExitWithChanges();
+                }
+                return true;
+            case R.id.save_action:
+                onSaveItem();
+            default:
+                return super.onOptionsItemSelected(menuItem);
+        }
+    }
+
 
 
 }

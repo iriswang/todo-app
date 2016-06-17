@@ -7,4 +7,7 @@ public class TodoAppConstants {
     public static String GROUP_POSITION = "groupPosition";
     public static String CHILD_POSITION = "childPosition";
 
+    public static final int EDIT_REQUEST_CODE = 20;
+    public static final int ADD_REQUEST_CODE = 30;
+
 }

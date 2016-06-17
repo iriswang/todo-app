@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:todoapp="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/save_action"
+          android:icon="@drawable/save"
+          android:title="@string/save_action"
+          todoapp:showAsAction="always"/>
+
+    <item android:id="@+id/cancel_action"
+          android:icon="@drawable/multiply"
+          android:title="@string/cancel_action"
+          todoapp:showAsAction="always"/>
+</menu>

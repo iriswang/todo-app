@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private final int EDIT_REQUEST_CODE = 20;
-    private final int ADD_REQUEST_CODE = 30;
 
     private final String COMPLETED_ITEMS = "Completed";
     private final String UNFINISHED_ITEMS = "To Do";
@@ -44,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     List<String> todoItemListDataHeaders;
     HashMap<String, List<TodoItem>> todoItemsListDataChildren;
 
-    EditText etEditText;
     TodoItemDatabaseDAO todoItemDAO;
 
     @Override
@@ -62,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
             todoItemsListDataChildren);
 
         expListView.setAdapter(todoItemListAdapter);
-        etEditText = (EditText) findViewById(R.id.etEditText);
+        expListView.expandGroup(0);
+
     }
 
     private void prepareListData() {
@@ -128,21 +125,8 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
         i.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
         i.putExtra("item", fetchTodoItem(groupPosition, childPosition));
-        startActivityForResult(i, EDIT_REQUEST_CODE);
-    }
-
-    public void onAddItem(View view) {
-        String newItem = etEditText.getText().toString();
-        try {
-            TodoItem item = new TodoItem(newItem);
-            todoItemDAO.addItem(item);
-            todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(item);
-            etEditText.setText("");
-            todoItemListAdapter.notifyDataSetChanged();
-        } catch (Exception e) {
-            Toast.makeText(this, "Item must at least contain one character!", Toast.LENGTH_SHORT)
-                 .show();
-        }
+        i.putExtra("request_type", TodoAppConstants.EDIT_REQUEST_CODE);
+        startActivityForResult(i, TodoAppConstants.EDIT_REQUEST_CODE);
     }
 
     private TodoItem fetchTodoItem(int groupPosition, int childPosition) {
@@ -152,9 +136,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT_REQUEST_CODE) {
+        if (requestCode == TodoAppConstants.EDIT_REQUEST_CODE) {
             handleEditItemResult(data, resultCode);
-        } else if (requestCode == ADD_REQUEST_CODE) {
+        } else if (requestCode == TodoAppConstants.ADD_REQUEST_CODE) {
             handleAddItemResult(data, resultCode);
         }
     }
@@ -184,16 +168,14 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
             todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
-            etEditText.setText("");
             todoItemListAdapter.notifyDataSetChanged();
         }
     }
 
     private void addNewTask() {
         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-        startActivityForResult(i, ADD_REQUEST_CODE);
-        Toast.makeText(this, "menu works!", Toast.LENGTH_SHORT)
-             .show();
+        i.putExtra("request_type", TodoAppConstants.ADD_REQUEST_CODE);
+        startActivityForResult(i, TodoAppConstants.ADD_REQUEST_CODE);
     }
 
     @Override
