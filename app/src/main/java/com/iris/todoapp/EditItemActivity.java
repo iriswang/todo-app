@@ -49,7 +49,6 @@ public class EditItemActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
-        setUpToolBar();
 
         editItem = (EditText) findViewById(R.id.etEditItem);
         editItem.setSelection(editItem.getText().length());
@@ -60,6 +59,8 @@ public class EditItemActivity extends AppCompatActivity {
         groupPosition = getIntent().getIntExtra(TodoAppConstants.GROUP_POSITION, -1);
         childPosition = getIntent().getIntExtra(TodoAppConstants.CHILD_POSITION, -1);
         requestType = (int) getIntent().getSerializableExtra("request_type");
+
+        setUpToolBar();
 
         if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
             item = new TodoItem();
@@ -79,6 +80,11 @@ public class EditItemActivity extends AppCompatActivity {
 
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
+            toolbar.setTitle("Add Item");
+        } else if (requestType == TodoAppConstants.EDIT_REQUEST_CODE) {
+            toolbar.setTitle("Edit Item");
+        }
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.mipmap.ic_arrow_back_white_24dp);
 
@@ -108,7 +114,7 @@ public class EditItemActivity extends AppCompatActivity {
         tvDueDate = (TextView) findViewById(R.id.tvActualDate);
         final Date dueDate;
         if (item.dueDate == null) {
-            tvDueDate.setText("Add a due date");
+            tvDueDate.setText("Set a due date");
             dueDate = getCurrentTimeDate();
         } else {
             dueDate = new Date(item.dueDate);
@@ -123,7 +129,7 @@ public class EditItemActivity extends AppCompatActivity {
                 }
             }, dueDate.getYear(), dueDate.getMonth() - 1, dueDate.getDay());
 
-        dueDatePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE",
+        dueDatePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SET",
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     Date newDate = new Date(dueDatePickerDialog.getDatePicker().getYear(),
