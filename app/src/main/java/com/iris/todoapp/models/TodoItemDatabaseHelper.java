@@ -1,4 +1,4 @@
-package com.iris.todoapp;
+package com.iris.todoapp.models;
 
 /**
  * Created by iris on 3/25/16.
@@ -7,6 +7,10 @@ package com.iris.todoapp;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.iris.todoapp.models.TodoItem;
+
+
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 public class TodoItemDatabaseHelper extends SQLiteOpenHelper {

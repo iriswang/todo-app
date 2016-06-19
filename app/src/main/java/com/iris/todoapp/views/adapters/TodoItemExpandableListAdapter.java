@@ -1,16 +1,13 @@
-package com.iris.todoapp;
+package com.iris.todoapp.views.adapters;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +15,10 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.iris.todoapp.TodoItem.Priority;
-import com.iris.todoapp.TodoItem.Status;
-
-import org.w3c.dom.Text;
+import com.iris.todoapp.R;
+import com.iris.todoapp.models.TodoItem;
+import com.iris.todoapp.models.TodoItem.Priority;
+import com.iris.todoapp.models.TodoItem.Status;
 
 
 public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {

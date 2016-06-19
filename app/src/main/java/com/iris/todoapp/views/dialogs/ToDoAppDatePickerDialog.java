@@ -1,4 +1,4 @@
-package com.iris.todoapp;
+package com.iris.todoapp.views.dialogs;
 
 import android.app.DatePickerDialog;
 import android.content.Context;

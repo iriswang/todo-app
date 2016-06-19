@@ -1,10 +1,11 @@
-package com.iris.todoapp;
+package com.iris.todoapp.models;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
-import com.iris.todoapp.TodoItem.Status;
+import com.iris.todoapp.models.TodoItem;
+import com.iris.todoapp.models.TodoItem.Status;
 
 
 import java.util.ArrayList;

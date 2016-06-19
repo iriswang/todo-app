@@ -1,4 +1,4 @@
-package com.iris.todoapp;
+package com.iris.todoapp.activities;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -20,8 +20,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.iris.todoapp.TodoItem.Priority;
-import com.iris.todoapp.TodoItem.Status;
+import com.iris.todoapp.R;
+import com.iris.todoapp.views.dialogs.ToDoAppDatePickerDialog;
+import com.iris.todoapp.utils.TodoAppConstants;
+import com.iris.todoapp.models.TodoItem;
+import com.iris.todoapp.models.TodoItem.Priority;
+import com.iris.todoapp.models.TodoItem.Status;
+import com.iris.todoapp.models.TodoItemDatabaseDAO;
+import com.iris.todoapp.models.TodoItemDatabaseHelper;
 
 
 import java.util.Calendar;

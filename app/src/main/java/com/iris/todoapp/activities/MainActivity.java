@@ -1,4 +1,4 @@
-package com.iris.todoapp;
+package com.iris.todoapp.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -15,8 +15,15 @@ import android.widget.ExpandableListView.OnChildClickListener;
 
 import com.google.common.collect.ImmutableMap;
 
-import com.iris.todoapp.TodoItem.Priority;
-import com.iris.todoapp.TodoItem.Status;
+import com.iris.todoapp.R;
+import com.iris.todoapp.utils.TodoAppConstants;
+import com.iris.todoapp.models.TodoItem;
+import com.iris.todoapp.models.TodoItem.Priority;
+import com.iris.todoapp.models.TodoItem.Status;
+import com.iris.todoapp.models.TodoItemDatabaseDAO;
+import com.iris.todoapp.models.TodoItemDatabaseHelper;
+import com.iris.todoapp.views.adapters.TodoItemExpandableListAdapter;
+
 
 import java.util.ArrayList;
 import java.util.Collections;

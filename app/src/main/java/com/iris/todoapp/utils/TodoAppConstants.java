@@ -1,4 +1,4 @@
-package com.iris.todoapp;
+package com.iris.todoapp.utils;
 
 /**
  * Created by iris on 6/14/16.
