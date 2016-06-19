@@ -1,6 +1,7 @@
 package com.iris.todoapp;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -10,14 +11,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.iris.todoapp.TodoItem.Priority;
 import com.iris.todoapp.TodoItem.Status;
+
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class EditItemActivity extends AppCompatActivity {
 
@@ -30,6 +38,8 @@ public class EditItemActivity extends AppCompatActivity {
     EditText editNotes;
     Spinner prioritySpinner;
     Spinner statusSpinner;
+    TextView tvDueDate;
+    ToDoAppDatePickerDialog dueDatePickerDialog;
     TodoItemDatabaseDAO todoItemDAO;
 
     @Override
@@ -39,11 +49,10 @@ public class EditItemActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
+        setUpToolBar();
+
         editItem = (EditText) findViewById(R.id.etEditItem);
         editItem.setSelection(editItem.getText().length());
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         editNotes = (EditText) findViewById(R.id.etEditNotes);
         editNotes.setSelection(editNotes.getText().length());
@@ -65,8 +74,82 @@ public class EditItemActivity extends AppCompatActivity {
         originalItem = TodoItem.newInstance(item);
         createPrioritySpinner(item.priority);
         createStatusSpinner(item.status);
+        setUpDateViews();
     }
 
+    private void setUpToolBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.mipmap.ic_arrow_back_white_24dp);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (originalItem.equals(item)
+                    && editItem.getText().toString().equals(originalItem.title)
+                    && editNotes.getText().toString().equals(originalItem.notes)) {
+                    finish();
+                } else {
+                    handleExitWithChanges();
+                }
+            }
+        });
+    }
+
+    private Date getCurrentTimeDate() {
+        Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH) + 1;
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+        return new Date(mYear, mMonth, mDay);
+    }
+
+    private void setUpDateViews() {
+        tvDueDate = (TextView) findViewById(R.id.tvActualDate);
+        final Date dueDate;
+        if (item.dueDate == null) {
+            tvDueDate.setText("Add a due date");
+            dueDate = getCurrentTimeDate();
+        } else {
+            dueDate = new Date(item.dueDate);
+            String dateString = (String)
+                android.text.format.DateFormat.format("MMMM dd", dueDate);
+            tvDueDate.setText(dateString);
+        }
+
+        dueDatePickerDialog = new ToDoAppDatePickerDialog(this,
+            new OnDateSetListener() {
+                public void onDateSet(DatePicker view, int year, int month, int day) {
+                }
+            }, dueDate.getYear(), dueDate.getMonth() - 1, dueDate.getDay());
+
+        dueDatePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SAVE",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Date newDate = new Date(dueDatePickerDialog.getDatePicker().getYear(),
+                        dueDatePickerDialog.getDatePicker().getMonth(),
+                        dueDatePickerDialog.getDatePicker().getDayOfMonth());
+                    item.dueDate = newDate.getTime();
+                    String dateString = (String)
+                        android.text.format.DateFormat.format("MMMM dd", item.dueDate);
+                    tvDueDate.setText(dateString);
+                    dialog.cancel();
+                }
+            });
+
+        dueDatePickerDialog.getDatePicker().updateDate(dueDate.getYear(),
+            dueDate.getMonth(), dueDate.getDay());
+
+        tvDueDate.setOnClickListener(
+            new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   dueDatePickerDialog.show();
+                }
+            }
+        );
+
+    }
 
     private void handleInvalidEdit() {
         AlertDialog.Builder invalidEditBuilder = new AlertDialog.Builder(EditItemActivity.this);
@@ -99,7 +182,9 @@ public class EditItemActivity extends AppCompatActivity {
             android.R.layout.simple_spinner_item, TodoItem.Priority.ALL_PRIORITIES);
 
         priorityListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         prioritySpinner.setAdapter(priorityListAdapter);
+
         prioritySpinner.setSelection(Priority.ALL_PRIORITIES.indexOf(originalPriority));
         prioritySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
@@ -179,6 +264,36 @@ public class EditItemActivity extends AppCompatActivity {
 
     }
 
+    private void handleDeleteTask() {
+        AlertDialog.Builder deleteTaskAlertDialog = new AlertDialog.Builder(EditItemActivity.this);
+        deleteTaskAlertDialog.setMessage("Are you sure you want to delete this task?");
+        deleteTaskAlertDialog.setCancelable(true);
+
+        deleteTaskAlertDialog.setPositiveButton("OK",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    todoItemDAO.deleteItem(originalItem._id);
+                    Intent data = new Intent();
+                    data.putExtra(TodoAppConstants.GROUP_POSITION, groupPosition);
+                    data.putExtra(TodoAppConstants.CHILD_POSITION, childPosition);
+                    setResult(TodoAppConstants.RESULT_DELETED_TASK, data);
+                    finish();
+                    dialog.cancel();
+                }
+            });
+
+        deleteTaskAlertDialog.setNegativeButton(
+            "CANCEL",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    finish();
+                    dialog.cancel();
+                }
+            });
+        AlertDialog deleteTaskAlert = deleteTaskAlertDialog.create();
+        deleteTaskAlert.show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -189,17 +304,12 @@ public class EditItemActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.cancel_action:
-                if (originalItem.equals(item)
-                    && editItem.getText().toString().equals(originalItem.title)
-                    && editNotes.getText().toString().equals(originalItem.notes)) {
-                    finish();
-                } else {
-                   handleExitWithChanges();
-                }
+            case R.id.delete_task:
+                handleDeleteTask();
                 return true;
             case R.id.save_action:
                 onSaveItem();
+                return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
         }

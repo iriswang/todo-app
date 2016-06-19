@@ -13,4 +13,7 @@
     <string name="cancel_action">cancel action</string>
     <string name="save_action">save action</string>
     <string name="Notes">Notes</string>
+    <string name="delete_action">delete action</string>
+    <string name="name_hint">Add a title here</string>
+    <string name="notes_hint">Add Notes...</string>
 </resources>

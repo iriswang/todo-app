@@ -81,11 +81,11 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
 
     private void setPriorityViewColor(TextView tv, TodoItem item) {
         if (item.priority == Priority.HIGH) {
-            tv.setTextColor(Color.parseColor("#D62920"));
+            tv.setTextColor(Color.parseColor(TodoAppConstants.HIGH_PRI_COLOR));
         } else if (item.priority == Priority.MEDIUM) {
-            tv.setTextColor(Color.parseColor("#F0BF2B"));
+            tv.setTextColor(Color.parseColor(TodoAppConstants.MEDIUM_PRI_COLOR));
         } else {
-            tv.setTextColor(Color.parseColor("#1CC78B"));
+            tv.setTextColor(Color.parseColor(TodoAppConstants.LOW_PRI_COLOR));
         }
 
     }

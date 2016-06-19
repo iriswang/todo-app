@@ -99,21 +99,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
                 long id) {
-                int itemType = ExpandableListView.getPackedPositionType(id);
-
-                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    int childPosition = ExpandableListView.getPackedPositionChild(id);
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    String groupName = todoItemListDataHeaders.get(groupPosition);
-                    TodoItem itemToDelete =
-                        todoItemsListDataChildren.get(groupName).get(childPosition);
-                    todoItemDAO.deleteItem(itemToDelete._id);
-                    todoItemsListDataChildren.get(groupName).remove(childPosition);
-                    todoItemListAdapter.notifyDataSetChanged();
-                    return true; //true if we consumed the click, false if not
-                } else {
-                    return false;
-                }
+                return handleDelete(id);
             }
         });
 
@@ -125,6 +111,25 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+    }
+
+    private boolean handleDelete(long id) {
+        int itemType = ExpandableListView.getPackedPositionType(id);
+
+        if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            int childPosition = ExpandableListView.getPackedPositionChild(id);
+            int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+            String groupName = todoItemListDataHeaders.get(groupPosition);
+            TodoItem itemToDelete =
+                todoItemsListDataChildren.get(groupName).get(childPosition);
+            todoItemDAO.deleteItem(itemToDelete._id);
+            todoItemsListDataChildren.get(groupName).remove(childPosition);
+            todoItemListAdapter.notifyDataSetChanged();
+            return true; //true if we consumed the click, false if not
+        } else {
+            return false;
+        }
 
     }
 
@@ -169,6 +174,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 todoItemListAdapter.notifyDataSetChanged();
            }
+        } else if (resultCode == TodoAppConstants.RESULT_DELETED_TASK) {
+            int groupPosition = data.getExtras().getInt(TodoAppConstants.GROUP_POSITION);
+            String groupName = todoItemListDataHeaders.get(groupPosition);
+            int childPosition = data.getExtras().getInt(TodoAppConstants.CHILD_POSITION);
+            todoItemsListDataChildren.get(groupName).remove(childPosition);
+            todoItemListAdapter.notifyDataSetChanged();
         }
     }
 

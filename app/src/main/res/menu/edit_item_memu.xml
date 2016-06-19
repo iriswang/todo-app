@@ -8,8 +8,10 @@
           todoapp:showAsAction="always"
         />
 
-    <item android:id="@+id/cancel_action"
-          android:icon="@mipmap/ic_close_white_24dp"
-          android:title="@string/cancel_action"
-          todoapp:showAsAction="always"/>
+    <item android:id="@+id/delete_task"
+          android:icon="@mipmap/ic_delete_white_24dp"
+          android:title="@string/delete_action"
+          todoapp:showAsAction="always"
+        />
+
 </menu>
