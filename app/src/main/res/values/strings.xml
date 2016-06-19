@@ -16,4 +16,6 @@
     <string name="delete_action">delete action</string>
     <string name="name_hint">Add a title here</string>
     <string name="notes_hint">Add Notes...</string>
+    <string name="today">Today</string>
+    <string name="inbox">Inbox</string>
 </resources>
