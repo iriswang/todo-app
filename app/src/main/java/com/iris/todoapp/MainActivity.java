@@ -3,6 +3,7 @@ package com.iris.todoapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         expListView.setGroupIndicator(null);
 
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         expListView.setAdapter(todoItemListAdapter);
         expListView.expandGroup(0);
         expListView.expandGroup(1);
+        expListView.setFocusable(false);
 
     }
 

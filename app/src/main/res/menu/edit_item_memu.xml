@@ -3,13 +3,13 @@
       xmlns:todoapp="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/save_action"
-          android:icon="@drawable/save"
+          android:icon="@mipmap/ic_save_white_24dp"
           android:title="@string/save_action"
           todoapp:showAsAction="always"
         />
 
     <item android:id="@+id/cancel_action"
-          android:icon="@drawable/multiply"
+          android:icon="@mipmap/ic_close_white_24dp"
           android:title="@string/cancel_action"
           todoapp:showAsAction="always"/>
 </menu>
