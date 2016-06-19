@@ -78,7 +78,13 @@ public class TodoItem implements Serializable {
         if (obj == null || !(obj instanceof TodoItem))
             return false;
         TodoItem other = (TodoItem) obj;
-        return _id == other._id
+        Boolean test = _id == other._id;
+        Boolean dueDateCHeck = (dueDate == other.dueDate);
+        Boolean priorituCHeck = (priority == other.priority);
+        Boolean statusCheck = (status == other.status);
+        Boolean tagCheck = (tag == other.tag);
+        Boolean notesCheck = (notes == other.notes);
+        return (_id == other._id)
             && dueDate == other.dueDate
             && priority == other.priority
             && status == other.status

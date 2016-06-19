@@ -70,9 +70,11 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
         if (childItem.status == Status.TODO) {
             txtListChildPriority.setText(childItem.priority.toString());
             setPriorityViewColor(txtListChildPriority, childItem);
-            txtListChildName.setTextColor(Color.parseColor("#000000"));
+            txtListChildName.setTextColor(
+                this._context.getResources().getColor(R.color.colorBlack));
         } else {
-            txtListChildName.setTextColor(Color.parseColor("#8c8c8c"));
+            txtListChildName.setTextColor(
+                    this._context.getResources().getColor(R.color.colorCompletedText));
             txtListChildPriority.setText("");
         }
 
@@ -81,11 +83,14 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
 
     private void setPriorityViewColor(TextView tv, TodoItem item) {
         if (item.priority == Priority.HIGH) {
-            tv.setTextColor(Color.parseColor(TodoAppConstants.HIGH_PRI_COLOR));
+            tv.setTextColor(
+                this._context.getResources().getColor(R.color.colorStatusHighPri));
         } else if (item.priority == Priority.MEDIUM) {
-            tv.setTextColor(Color.parseColor(TodoAppConstants.MEDIUM_PRI_COLOR));
+            tv.setTextColor(
+                this._context.getResources().getColor(R.color.colorStatusMedPri));
         } else {
-            tv.setTextColor(Color.parseColor(TodoAppConstants.LOW_PRI_COLOR));
+            tv.setTextColor(
+                this._context.getResources().getColor(R.color.colorStatusLowPri));
         }
 
     }

@@ -303,7 +303,7 @@ public class EditItemActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.edit_item_memu, menu);
+        inflater.inflate(R.menu.edit_item_menu, menu);
         return true;
     }
 
