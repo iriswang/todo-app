@@ -4,7 +4,7 @@
 
 Submitted by: **Iris Wang**
 
-Time spent: **~20** hours spent in total
+Time spent: **12-15** hours spent in total
 
 **Note**: I initially started the app a few months ago, but the bootcamp was moved so I lost track of how much time I initially put into it.
 
@@ -42,7 +42,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+![Video Walkthrough](iris_walkthrough.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
