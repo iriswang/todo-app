@@ -28,13 +28,13 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-* List anything else that you can get done to improve the app functionality!
 * [x] Sorts tasks based on priority
 * [x] Added priority to tasks
 * [x] Added due date to tasks
 * [x] Added notes to tasks
 * [x] Improved code structure of app
-* [x] Added a navigation drawer (separates out tasks that are due today versus all tasks)
+* [x] Splits tasks into two sections: To-Do, Completed
+* [x] Added a navigation drawer (separates out tasks that are due today vs all tasks)
 * [x] Added alerts for canceling without saving tasks
 
 
@@ -48,8 +48,9 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
-Some of the guides had some outdated code. I forgot which ones, but I can probably go through and find/fix them. Overall the guides
+**Challenges**
+
+Some of the guides had some outdated code. I forgot which ones, but I can probably go through and find/fix them. Overall, the guides
 were really good for the initial set up. I've read through additional codepath guides for more features and those were really helpful too. Thank you for putting all this work into this!
 
 ## License
