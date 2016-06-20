@@ -64,15 +64,21 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtListChildPriority = (TextView) convertView
             .findViewById(R.id.tvItemPriority);
 
+        TextView txtListChildDueDate = (TextView) convertView
+            .findViewById(R.id.tvItemDueDate);
+
         if (childItem.status == Status.TODO) {
             txtListChildPriority.setText(childItem.priority.toString());
             setPriorityViewColor(txtListChildPriority, childItem);
+            txtListChildDueDate.setText( (String)
+                android.text.format.DateFormat.format("MMMM dd", childItem.dueDate));
             txtListChildName.setTextColor(
                 this._context.getResources().getColor(R.color.colorBlack));
         } else {
             txtListChildName.setTextColor(
                     this._context.getResources().getColor(R.color.colorCompletedText));
             txtListChildPriority.setText("");
+            txtListChildDueDate.setText("");
         }
 
         return convertView;
