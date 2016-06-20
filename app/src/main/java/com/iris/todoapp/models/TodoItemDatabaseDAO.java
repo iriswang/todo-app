@@ -9,6 +9,7 @@ import com.iris.todoapp.models.TodoItem.Status;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import nl.qbusict.cupboard.QueryResultIterable;
 
@@ -37,12 +38,50 @@ public class TodoItemDatabaseDAO {
         cupboard().withDatabase(db).delete(TodoItem.class, id);
     }
 
+    private Long getTodayInMilliseconds() {
+        Calendar cal = Calendar.getInstance();
+        cal.clear(Calendar.HOUR);
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        return cal.getTimeInMillis();
+    }
+
+    public ArrayList<TodoItem> getTodaysCompletedItems() {
+        Cursor items = cupboard().withDatabase(db).query(TodoItem.class).getCursor();
+        ArrayList<TodoItem> result = new ArrayList<>();
+        QueryResultIterable<TodoItem> itemsIterable =
+            cupboard().withDatabase(db).query(TodoItem.class)
+                      .withSelection("status = ? AND dueDate = ?",
+                          Status.DONE.toString(),
+                          getTodayInMilliseconds().toString())
+                      .query();
+        for (TodoItem item: itemsIterable) {
+            result.add(item);
+        }
+        return result;
+    }
+
     public ArrayList<TodoItem> getCompletedItems() {
         Cursor items = cupboard().withDatabase(db).query(TodoItem.class).getCursor();
         ArrayList<TodoItem> result = new ArrayList<>();
         QueryResultIterable<TodoItem> itemsIterable =
             cupboard().withDatabase(db).query(TodoItem.class).withSelection(
                 "status = ?", Status.DONE.toString()).query();
+        for (TodoItem item: itemsIterable) {
+            result.add(item);
+        }
+        return result;
+    }
+
+    public ArrayList<TodoItem> getTodaysUnfinishedItems() {
+        ArrayList<TodoItem> result = new ArrayList<>();
+        QueryResultIterable<TodoItem> itemsIterable =
+            cupboard().withDatabase(db).query(TodoItem.class)
+                      .withSelection("status = ? AND dueDate = ?",
+                          Status.TODO.toString(),
+                          getTodayInMilliseconds().toString())
+                      .query();
         for (TodoItem item: itemsIterable) {
             result.add(item);
         }

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -108,49 +109,63 @@ public class EditItemActivity extends AppCompatActivity {
         });
     }
 
-    private Date getCurrentTimeDate() {
-        Calendar c = Calendar.getInstance();
-        int mYear = c.get(Calendar.YEAR);
-        int mMonth = c.get(Calendar.MONTH) + 1;
-        int mDay = c.get(Calendar.DAY_OF_MONTH);
-        return new Date(mYear, mMonth, mDay);
+    private Long convertCalendarToMilliseconds(Calendar cal) {
+        cal.clear(Calendar.HOUR);
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        return cal.getTimeInMillis();
+    }
+
+    private Calendar convertMillisecondsToCalendar(Long milliseconds) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(milliseconds);
+        return cal;
     }
 
     private void setUpDateViews() {
         tvDueDate = (TextView) findViewById(R.id.tvActualDate);
-        final Date dueDate;
+        final Calendar dueDate;
         if (item.dueDate == null) {
             tvDueDate.setText("Set a due date");
-            dueDate = getCurrentTimeDate();
+            dueDate = Calendar.getInstance();
         } else {
-            dueDate = new Date(item.dueDate);
+            dueDate = convertMillisecondsToCalendar(item.dueDate);
             String dateString = (String)
-                android.text.format.DateFormat.format("MMMM dd", dueDate);
+                android.text.format.DateFormat.format("MMMM dd", item.dueDate);
             tvDueDate.setText(dateString);
+            tvDueDate.setTextColor(
+                getApplicationContext().getResources()
+                                       .getColor(R.color.colorBlack));
         }
 
         dueDatePickerDialog = new ToDoAppDatePickerDialog(this,
             new OnDateSetListener() {
                 public void onDateSet(DatePicker view, int year, int month, int day) {
                 }
-            }, dueDate.getYear(), dueDate.getMonth() - 1, dueDate.getDay());
+            }, dueDate.get(Calendar.YEAR), dueDate.get(Calendar.MONTH),
+            dueDate.get(Calendar.DAY_OF_MONTH));
 
         dueDatePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, "SET",
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    Date newDate = new Date(dueDatePickerDialog.getDatePicker().getYear(),
+                    Calendar newDate = Calendar.getInstance();
+                    newDate.set(dueDatePickerDialog.getDatePicker().getYear(),
                         dueDatePickerDialog.getDatePicker().getMonth(),
                         dueDatePickerDialog.getDatePicker().getDayOfMonth());
-                    item.dueDate = newDate.getTime();
+                    item.dueDate = convertCalendarToMilliseconds(newDate);
                     String dateString = (String)
                         android.text.format.DateFormat.format("MMMM dd", item.dueDate);
                     tvDueDate.setText(dateString);
+                    tvDueDate.setTextColor(
+                        getApplicationContext().getResources()
+                            .getColor(R.color.colorBlack));
                     dialog.cancel();
                 }
             });
 
-        dueDatePickerDialog.getDatePicker().updateDate(dueDate.getYear(),
-            dueDate.getMonth(), dueDate.getDay());
+        dueDatePickerDialog.getDatePicker().updateDate(dueDate.get(Calendar.YEAR),
+            dueDate.get(Calendar.MONTH), dueDate.get(Calendar.DAY_OF_MONTH));
 
         tvDueDate.setOnClickListener(
             new OnClickListener() {
