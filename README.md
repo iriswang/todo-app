@@ -4,7 +4,7 @@
 
 Submitted by: **Iris Wang**
 
-Time spent: **~20** hours spent in total
+Time spent: **12-15** hours spent in total
 
 **Note**: I initially started the app a few months ago, but the bootcamp was moved so I lost track of how much time I initially put into it.
 
