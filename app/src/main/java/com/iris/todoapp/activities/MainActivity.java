@@ -266,7 +266,11 @@ public class MainActivity extends AppCompatActivity {
     private void handleAddItemResult(Intent data, int resultCode) {
         if (resultCode == RESULT_OK) {
             TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
-            todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
+            if (newItem.status == Status.TODO) {
+                todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
+            } else {
+                todoItemsListDataChildren.get(COMPLETED_ITEMS).add(newItem);
+            }
             todoItemListAdapter.notifyDataSetChanged();
         }
     }
