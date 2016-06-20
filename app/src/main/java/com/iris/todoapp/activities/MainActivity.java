@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
     TodoItemDatabaseDAO todoItemDAO;
 
-    TasksToShow _tasksToShow = TasksToShow.TODAY;
+    TasksToShow _tasksToShow = TasksToShow.ALL_TASKS;
 
     private enum TasksToShow {
-        TODAY, INBOX
+        TODAY, ALL_TASKS
     }
 
     @Override
@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         expListView.setGroupIndicator(null);
@@ -99,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.ic_menu_white_24dp);
+        if (_tasksToShow == TasksToShow.ALL_TASKS) {
+            toolbar.setTitle(getApplicationContext()
+                .getResources().getString(R.string.all_tasks));
+        } else {
+            toolbar.setTitle(getApplicationContext()
+                .getResources().getString(R.string.today));
+        }
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 newTaskToShow = TasksToShow.TODAY;
                 break;
             case R.id.nav_drawer_inbox:
-                newTaskToShow = TasksToShow.INBOX;
+                newTaskToShow = TasksToShow.ALL_TASKS;
                 break;
             default:
                 newTaskToShow = _tasksToShow;
