@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -30,9 +29,7 @@ import com.iris.todoapp.models.TodoItem.Status;
 import com.iris.todoapp.models.TodoItemDatabaseDAO;
 import com.iris.todoapp.models.TodoItemDatabaseHelper;
 
-
 import java.util.Calendar;
-import java.util.Date;
 
 public class EditItemActivity extends AppCompatActivity {
 
