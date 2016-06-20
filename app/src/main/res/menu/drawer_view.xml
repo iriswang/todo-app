@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<group android:checkableBehavior="single">
+    <item
+        android:id="@+id/nav_drawer_today"
+        android:icon="@mipmap/ic_today_white_24dp"
+        android:title="@string/today" />
+    <item
+        android:id="@+id/nav_drawer_inbox"
+        android:icon="@mipmap/ic_inbox_white_24dp"
+        android:title="@string/inbox" />
+</group>
+</menu>
