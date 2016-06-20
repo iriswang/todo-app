@@ -4,7 +4,7 @@
 
 Submitted by: **Iris Wang**
 
-Time spent: **12-15** hours spent in total
+Time spent: **13-15** hours spent in total
 
 **Note**: I initially started the app a few months ago, but the bootcamp was moved so I lost track of how much time I initially put into it.
 
@@ -34,8 +34,9 @@ The following **additional** features are implemented:
 * [x] Added notes to tasks
 * [x] Improved code structure of app
 * [x] Splits tasks into two sections: To-Do, Completed
-* [x] Added a navigation drawer (separates out tasks that are due today vs all tasks)
+* [x] Alerts user before task deletion
 * [x] Added alerts for canceling without saving tasks
+* [ ] [In progress, on separate branch] Added a navigation drawer
 
 
 ## Video Walkthrough 
