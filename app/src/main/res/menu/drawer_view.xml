@@ -8,6 +8,6 @@
     <item
         android:id="@+id/nav_drawer_inbox"
         android:icon="@mipmap/ic_inbox_white_24dp"
-        android:title="@string/inbox" />
+        android:title="@string/all_tasks" />
 </group>
 </menu>

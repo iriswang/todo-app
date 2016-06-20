@@ -18,4 +18,6 @@
     <string name="notes_hint">Add Notes...</string>
     <string name="today">Today</string>
     <string name="inbox">Inbox</string>
+    <string name="all_tasks">All Tasks</string>
+    <string name="todo_list">To Do List</string>
 </resources>
