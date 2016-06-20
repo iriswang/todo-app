@@ -98,6 +98,10 @@ public class EditItemActivity extends AppCompatActivity {
                 if (originalItem.equals(item)
                     && editItem.getText().toString().equals(originalItem.title)
                     && editNotes.getText().toString().equals(originalItem.notes)) {
+                    if (requestType == TodoAppConstants.ADD_REQUEST_CODE) {
+                        Intent data = new Intent();
+                        setResult(RESULT_CANCELED, data);
+                    }
                     finish();
                 } else {
                     handleExitWithChanges();

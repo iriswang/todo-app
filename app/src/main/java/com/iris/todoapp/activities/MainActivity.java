@@ -73,11 +73,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        expListView = (ExpandableListView) findViewById(R.id.lvExp);
-        expListView.setGroupIndicator(null);
-
         prepareListData(_tasksToShow);
-        setUpExpListViewClickHandlers();
 
         setUpListView();
         setUpToolBar();
@@ -86,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpListView() {
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
+        expListView.setGroupIndicator(null);
+
         todoItemListAdapter = new TodoItemExpandableListAdapter(this, todoItemListDataHeaders,
             todoItemsListDataChildren);
 
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         expListView.expandGroup(0);
         expListView.expandGroup(1);
         expListView.setFocusable(false);
+        setUpExpListViewClickHandlers();
     }
 
     private void setUpNavigationDrawer() {
@@ -153,9 +153,11 @@ public class MainActivity extends AppCompatActivity {
         switch(menuItem.getItemId()) {
             case R.id.nav_drawer_today:
                 newTaskToShow = TasksToShow.TODAY;
+                _tasksToShow = TasksToShow.TODAY;
                 break;
             case R.id.nav_drawer_inbox:
                 newTaskToShow = TasksToShow.ALL_TASKS;
+                _tasksToShow = TasksToShow.ALL_TASKS;
                 break;
             default:
                 newTaskToShow = _tasksToShow;
@@ -182,7 +184,15 @@ public class MainActivity extends AppCompatActivity {
         todoItemsListDataChildren = new HashMap<String, List<TodoItem>>();
         todoItemListDataHeaders.add(UNFINISHED_ITEMS);
         todoItemListDataHeaders.add(COMPLETED_ITEMS);
-        List<TodoItem> sortedUnfinishedItems = todoItemDAO.getUnfinishedItems();
+        List<TodoItem> sortedUnfinishedItems;
+        List<TodoItem> sortedCompletedItems;
+        if (tasksToShow == TasksToShow.TODAY) {
+            sortedUnfinishedItems = todoItemDAO.getTodaysUnfinishedItems();
+            sortedCompletedItems = todoItemDAO.getTodaysCompletedItems();
+        } else {
+            sortedUnfinishedItems = todoItemDAO.getUnfinishedItems();
+            sortedCompletedItems = todoItemDAO.getCompletedItems();
+        }
         Collections.sort(sortedUnfinishedItems, new Comparator<TodoItem>() {
             @Override
             public int compare(TodoItem lhs, TodoItem rhs) {
@@ -190,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         todoItemsListDataChildren.put(UNFINISHED_ITEMS, sortedUnfinishedItems);
-        List<TodoItem> sortedCompletedItems = todoItemDAO.getCompletedItems();
         Collections.sort(sortedCompletedItems, new Comparator<TodoItem>() {
             @Override
             public int compare(TodoItem lhs, TodoItem rhs) {
@@ -286,15 +295,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean taskDueToday(Long dueDate) {
+        if (dueDate == null) {
+            return false;
+        }
+        Long todayMilliSeconds = TodoItemDatabaseDAO.getTodayInMilliseconds();
+        boolean result = dueDate.equals(todayMilliSeconds);
+        return result;
+    }
+
     private void handleAddItemResult(Intent data, int resultCode) {
         if (resultCode == RESULT_OK) {
             TodoItem newItem = (TodoItem) data.getSerializableExtra("new_item");
-            if (newItem.status == Status.TODO) {
-                todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
-            } else {
-                todoItemsListDataChildren.get(COMPLETED_ITEMS).add(newItem);
+            if (newItem != null) {
+                if ((_tasksToShow == TasksToShow.ALL_TASKS) ||
+                    ((_tasksToShow == TasksToShow.TODAY) && taskDueToday(newItem.dueDate))) {
+                    if (newItem.status == Status.TODO) {
+                        todoItemsListDataChildren.get(UNFINISHED_ITEMS).add(newItem);
+                    } else {
+                        todoItemsListDataChildren.get(COMPLETED_ITEMS).add(newItem);
+                    }
+                    todoItemListAdapter.notifyDataSetChanged();
+                }
             }
-            todoItemListAdapter.notifyDataSetChanged();
         }
     }
 

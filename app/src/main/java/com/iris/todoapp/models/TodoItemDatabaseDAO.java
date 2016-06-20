@@ -38,7 +38,7 @@ public class TodoItemDatabaseDAO {
         cupboard().withDatabase(db).delete(TodoItem.class, id);
     }
 
-    private Long getTodayInMilliseconds() {
+    public static Long getTodayInMilliseconds() {
         Calendar cal = Calendar.getInstance();
         cal.clear(Calendar.HOUR);
         cal.clear(Calendar.MINUTE);
