@@ -160,5 +160,11 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
         super.notifyDataSetChanged();
     }
 
+    public void removeChild(int groupPosition, int childPosition) {
+        Object groupName = getGroup(groupPosition);
+        _listDataChildren.get(groupName).remove(childPosition);
+        notifyDataSetChanged();
+    }
+
 
 }

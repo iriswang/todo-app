@@ -30,6 +30,7 @@ import com.iris.todoapp.views.adapters.TodoItemExpandableListAdapter;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String COMPLETED_ITEMS = "COMPLETED";
     private final String UNFINISHED_ITEMS = "TO DO";
+
     DrawerLayout _drawerLayout;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
@@ -57,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
     TodoItemDatabaseDAO todoItemDAO;
 
+    TasksToShow _tasksToShow = TasksToShow.TODAY;
+
+    private enum TasksToShow {
+        TODAY, INBOX
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         TodoItemDatabaseHelper todoItemDBHelper = new TodoItemDatabaseHelper(this);
@@ -65,12 +73,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setUpToolBar();
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         expListView.setGroupIndicator(null);
 
-        prepareListData();
+        prepareListData(_tasksToShow);
         setUpExpListViewClickHandlers();
         todoItemListAdapter = new TodoItemExpandableListAdapter(this, todoItemListDataHeaders,
             todoItemsListDataChildren);
@@ -82,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         _drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        setUpToolBar();
         // Setup drawer view
         setupDrawerContent(nvDrawer);
     }
@@ -105,12 +113,42 @@ public class MainActivity extends AppCompatActivity {
             new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    selectDrawerItem(menuItem);
                     return true;
                 }
             });
     }
 
-    private void prepareListData() {
+    private void selectDrawerItem(MenuItem menuItem) {
+        TasksToShow newTaskToShow;
+        switch(menuItem.getItemId()) {
+            case R.id.nav_drawer_today:
+                newTaskToShow = TasksToShow.TODAY;
+                break;
+            case R.id.nav_drawer_inbox:
+                newTaskToShow = TasksToShow.INBOX;
+                break;
+            default:
+                newTaskToShow = _tasksToShow;
+        }
+
+        prepareListData(newTaskToShow);
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
+        // Set action bar title
+        setTitle(menuItem.getTitle());
+        // Close the navigation drawer
+        _drawerLayout.closeDrawers();
+    }
+
+    private void changeTasks(TasksToShow newTasksToShow) {
+        if (newTasksToShow != _tasksToShow) {
+            prepareListData(newTasksToShow);
+            todoItemListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void prepareListData(TasksToShow tasksToShow) {
         todoItemListDataHeaders = new ArrayList<String>();
         todoItemsListDataChildren = new HashMap<String, List<TodoItem>>();
         todoItemListDataHeaders.add(UNFINISHED_ITEMS);
@@ -164,8 +202,7 @@ public class MainActivity extends AppCompatActivity {
             TodoItem itemToDelete =
                 todoItemsListDataChildren.get(groupName).get(childPosition);
             todoItemDAO.deleteItem(itemToDelete._id);
-            todoItemsListDataChildren.get(groupName).remove(childPosition);
-            todoItemListAdapter.notifyDataSetChanged();
+            todoItemListAdapter.removeChild(groupPosition, childPosition);
             return true; //true if we consumed the click, false if not
         } else {
             return false;
@@ -205,8 +242,7 @@ public class MainActivity extends AppCompatActivity {
             if (newItem != oldItem) {
                 String newGroupName = statusToGroupNameMap.get(newItem.status);
                 if (newItem.status != oldItem.status) {
-                    String groupName = todoItemListDataHeaders.get(groupPosition);
-                    todoItemsListDataChildren.get(groupName).remove(childPosition);
+                    todoItemListAdapter.removeChild(groupPosition, childPosition);
                     todoItemsListDataChildren.get(newGroupName).add(newItem);
                 } else {
                     todoItemsListDataChildren.get(newGroupName).set(
@@ -216,10 +252,8 @@ public class MainActivity extends AppCompatActivity {
            }
         } else if (resultCode == TodoAppConstants.RESULT_DELETED_TASK) {
             int groupPosition = data.getExtras().getInt(TodoAppConstants.GROUP_POSITION);
-            String groupName = todoItemListDataHeaders.get(groupPosition);
             int childPosition = data.getExtras().getInt(TodoAppConstants.CHILD_POSITION);
-            todoItemsListDataChildren.get(groupName).remove(childPosition);
-            todoItemListAdapter.notifyDataSetChanged();
+            todoItemListAdapter.removeChild(groupPosition, childPosition);
         }
     }
 
@@ -235,6 +269,15 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
         i.putExtra("request_type", TodoAppConstants.ADD_REQUEST_CODE);
         startActivityForResult(i, TodoAppConstants.ADD_REQUEST_CODE);
+    }
+
+    private Long getTodayInMilliseconds() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     @Override
