@@ -20,4 +20,6 @@
     <string name="inbox">Inbox</string>
     <string name="all_tasks">All Tasks</string>
     <string name="todo_list">To Do List</string>
+    <string name="drawer_open">Open Drawer</string>
+    <string name="drawer_close">Close Drawer</string>
 </resources>

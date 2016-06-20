@@ -1,6 +1,7 @@
 package com.iris.todoapp.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout _drawerLayout;
     private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
+    Toolbar toolbar;
 
 
     private final Map<Status, String> statusToGroupNameMap = ImmutableMap.of(
@@ -78,6 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
         prepareListData(_tasksToShow);
         setUpExpListViewClickHandlers();
+
+        setUpListView();
+        setUpToolBar();
+        setUpNavigationDrawer();
+        // Setup drawer view
+    }
+
+    private void setUpListView() {
         todoItemListAdapter = new TodoItemExpandableListAdapter(this, todoItemListDataHeaders,
             todoItemsListDataChildren);
 
@@ -85,19 +95,38 @@ public class MainActivity extends AppCompatActivity {
         expListView.expandGroup(0);
         expListView.expandGroup(1);
         expListView.setFocusable(false);
+    }
 
+    private void setUpNavigationDrawer() {
         _drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
-        setUpToolBar();
-        // Setup drawer view
+        drawerToggle = new ActionBarDrawerToggle(
+            this,
+            _drawerLayout,
+            toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                invalidateOptionsMenu();
+                super.onDrawerClosed(view);
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+        _drawerLayout.setDrawerListener(drawerToggle);
         setupDrawerContent(nvDrawer);
     }
 
     private void setUpToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
-        toolbar.setNavigationIcon(R.mipmap.ic_menu_white_24dp);
         if (_tasksToShow == TasksToShow.ALL_TASKS) {
             toolbar.setTitle(getApplicationContext()
                 .getResources().getString(R.string.all_tasks));
@@ -105,13 +134,9 @@ public class MainActivity extends AppCompatActivity {
             toolbar.setTitle(getApplicationContext()
                 .getResources().getString(R.string.today));
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                _drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_menu_white_24dp);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -281,15 +306,6 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(i, TodoAppConstants.ADD_REQUEST_CODE);
     }
 
-    private Long getTodayInMilliseconds() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTimeInMillis();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -299,6 +315,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
             case R.id.new_task:
                 addNewTask();
@@ -307,5 +326,25 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        setUpListView();
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
 }
