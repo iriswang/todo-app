@@ -1,5 +1,7 @@
 package com.iris.todoapp.models;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
 import com.google.common.collect.ImmutableMap;
 
 
@@ -84,6 +86,20 @@ public class TodoItem implements Serializable {
             && status == other.status
             && tag == other.tag
             && notes == other.notes;
+    }
+
+    @TargetApi(VERSION_CODES.KITKAT)
+    public static int sort(TodoItem lhs, TodoItem rhs) {
+        if (lhs.priority == rhs.priority) {
+            if (lhs.dueDate == null) {
+                return 1;
+            }
+            if (rhs.dueDate == null) {
+                return -1;
+            }
+            return Long.compare(lhs.dueDate, rhs.dueDate);
+        }
+        return Priority.sort(lhs.priority, rhs.priority);
     }
 }
 

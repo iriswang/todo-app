@@ -24,7 +24,7 @@
             android:orientation="vertical">
             <TextView
                 android:id="@+id/tvItemPriority"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:textSize="10dp"
@@ -34,7 +34,7 @@
                 />
             <TextView
                 android:id="@+id/tvItemDueDate"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="10dp"
                 android:gravity="left"

@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
+import android.os.Build.VERSION_CODES;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,13 +73,17 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
         if (childItem.status == Status.TODO) {
             txtListChildPriority.setText(childItem.priority.toString());
             setPriorityViewColor(txtListChildPriority, childItem);
-            txtListChildDueDate.setText( (String)
-                android.text.format.DateFormat.format("MMMM dd", childItem.dueDate));
+            if (childItem.dueDate != null) {
+                txtListChildDueDate.setText((String)
+                    android.text.format.DateFormat.format("MMMM dd", childItem.dueDate));
+            } else {
+                txtListChildDueDate.setText("");
+            }
             txtListChildName.setTextColor(
                 this._context.getResources().getColor(R.color.colorBlack));
         } else {
             txtListChildName.setTextColor(
-                    this._context.getResources().getColor(R.color.colorCompletedText));
+                this._context.getResources().getColor(R.color.colorCompletedText));
             txtListChildPriority.setText("");
             txtListChildDueDate.setText("");
         }
@@ -156,11 +163,12 @@ public class TodoItemExpandableListAdapter extends BaseExpandableListAdapter {
     public void notifyDataSetChanged() {
         for (Map.Entry<String, List<TodoItem>> entry: this._listDataChildren.entrySet()) {
             Collections.sort(entry.getValue(), new Comparator<TodoItem>() {
-                    @Override
-                    public int compare(TodoItem lhs, TodoItem rhs) {
-                        return Priority.sort(lhs.priority, rhs.priority);
-                    }
-                });
+                @TargetApi(VERSION_CODES.KITKAT)
+                @Override
+                public int compare(TodoItem lhs, TodoItem rhs) {
+                    return TodoItem.sort(lhs, rhs);
+                }
+            });
         }
 
         super.notifyDataSetChanged();
